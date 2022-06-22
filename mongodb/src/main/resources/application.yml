@@ -1,0 +1,12 @@
+mongodb:
+  # uri: mongodb://user:pwd@localhost:27017/
+  uri: mongodb://localhost:27017
+  db1: db1
+  db2: db2
+  file_server: file_server
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2000MB
+      max-request-size: 2000MB
