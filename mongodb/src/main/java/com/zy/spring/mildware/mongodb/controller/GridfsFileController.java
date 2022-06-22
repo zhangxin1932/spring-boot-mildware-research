@@ -39,7 +39,7 @@ public class GridfsFileController {
     private GridFsTemplate tipsGridFsTemplate;
 
     @PostMapping("upload")
-    public ObjectId upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+    public Object upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         // CommonsFileUploadSupport
         try {
             String fileName = file.getName();
@@ -50,16 +50,17 @@ public class GridfsFileController {
             // String hex = HexUtils.toHex(UUID.randomUUID().toString().replace("-", "").getBytes(StandardCharsets.UTF_8));
             ObjectId objectId = new ObjectId();
             uploadBuilder.id(objectId);
+            Document metaData = new Document();
+            metaData.put("timestamp", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now()));
             if (StringUtils.hasText(fileName)) {
                 uploadBuilder.filename(fileName);
             }
             if (StringUtils.hasText(contentType)) {
                 uploadBuilder.contentType(contentType);
+                metaData.put("content-type", contentType);
             }
-            Document metaData = new Document();
-            metaData.put("timestamp", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now()));
             uploadBuilder.metadata(metaData);
-            return tipsGridFsTemplate.store(uploadBuilder.build());
+            return tipsGridFsTemplate.store(uploadBuilder.build()).toHexString();
         } catch (Exception e) {
             log.error("failed to store file:{}.", file.getName(), e);
         }
@@ -76,8 +77,8 @@ public class GridfsFileController {
             GridFsResource resource = tipsGridFsTemplate.getResource(file);
             InputStream content = resource.getContent();
             // 设置ContentType字段值
-            response.setContentType(resource.getContentType());
-            //设置响应消息编码
+            response.setContentType(file.getMetadata().getString("content-type"));
+            // 设置响应消息编码
             response.setCharacterEncoding("utf-8");
             // 通知浏览器以下载的方式打开
             response.addHeader("Content-Disposition",
