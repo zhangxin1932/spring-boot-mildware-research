@@ -47,7 +47,6 @@ public class GridfsFileController {
             Assert.hasText(fileName, "filename cannot be empty.");
             Assert.hasText(contentType, "contentType cannot be empty.");
             GridFsUpload.GridFsUploadBuilder<ObjectId> uploadBuilder = GridFsUpload.fromStream(file.getInputStream());
-            // String hex = HexUtils.toHex(UUID.randomUUID().toString().replace("-", "").getBytes(StandardCharsets.UTF_8));
             ObjectId objectId = new ObjectId();
             uploadBuilder.id(objectId);
             Document metaData = new Document();
@@ -94,6 +93,18 @@ public class GridfsFileController {
         } catch (Exception e) {
             log.error("failed to download file, id is:{}.", fileId, e);
         }
+    }
+
+    @RequestMapping("checkFileName")
+    public Boolean checkFileName(@RequestParam("filename") String filename) {
+        Assert.hasText(filename, "filename cannot be empty.");
+        return Objects.isNull(tipsGridFsTemplate.findOne(Query.query(Criteria.where("filename").is(filename))));
+    }
+
+    @RequestMapping("deleteById")
+    public void deleteById(@RequestParam("fileId") String fileId) {
+        Assert.hasText(fileId, "fileId cannot be empty.");
+        tipsGridFsTemplate.delete(Query.query(Criteria.where("_id").is(fileId)));
     }
 
 }
