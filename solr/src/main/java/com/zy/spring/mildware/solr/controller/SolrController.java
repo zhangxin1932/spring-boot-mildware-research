@@ -46,6 +46,17 @@ public class SolrController {
         }
     }
 
+    @RequestMapping("deleteByQuery")
+    public Object deleteByQuery(String collection) {
+        try {
+            // 删除当前 collection 的所有文档
+            solrClient.deleteByQuery(collection, "*:*");
+        } catch (Exception e) {
+            log.error("failed to deleteByQuery from solr, collection is:{}.", collection, e);
+        }
+        return null;
+    }
+
     @RequestMapping("deleteById")
     public Object deleteById(String collection, String id) {
         try {
