@@ -25,6 +25,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * https://blog.csdn.net/ai_0922/article/details/105192399
@@ -42,7 +43,7 @@ public class GridfsFileController {
     public Object upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         // CommonsFileUploadSupport
         try {
-            String fileName = file.getName();
+            String fileName = file.getOriginalFilename();
             String contentType = file.getContentType();
             Assert.hasText(fileName, "filename cannot be empty.");
             Assert.hasText(contentType, "contentType cannot be empty.");
@@ -76,12 +77,17 @@ public class GridfsFileController {
             GridFsResource resource = tipsGridFsTemplate.getResource(file);
             InputStream content = resource.getContent();
             // 设置ContentType字段值
-            response.setContentType(file.getMetadata().getString("content-type"));
+            Document metadata = file.getMetadata();
+            String contentType = metadata.getString("content-type");
+            if (StringUtils.hasText(contentType)) {
+                response.setContentType(contentType);
+            }
             // 设置响应消息编码
             response.setCharacterEncoding("utf-8");
             // 通知浏览器以下载的方式打开
+            String filename = resource.getFilename();
             response.addHeader("Content-Disposition",
-                    "attachment;filename="+ URLEncoder.encode(resource.getFilename(),"utf-8"));
+                    "attachment;filename="+ URLEncoder.encode(StringUtils.hasText(filename) ? filename : UUID.randomUUID().toString(),"utf-8"));
             // 获取response对象的输出流
             OutputStream out = response.getOutputStream();
             byte[] buffer = new byte[1024];

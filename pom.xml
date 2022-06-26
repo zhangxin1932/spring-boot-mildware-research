@@ -11,6 +11,7 @@
     <modules>
         <module>netty</module>
         <module>mongodb</module>
+        <module>solr</module>
     </modules>
 
     <dependencyManagement>
