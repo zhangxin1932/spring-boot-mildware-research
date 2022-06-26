@@ -1,0 +1,10 @@
+server:
+  port: 8001
+rocketmq:
+  name-server: 192.169.0.156:9876;192.168.0.156:9877
+  producer:
+    group: spring-boot-rocketmq-producer-group01
+  custom:
+    topic: spring-boot-rocketmq-topic01
+    tags: spring-boot-rocketmq-tags01
+    consumer-group: spring-boot-rocketmq-consumer-group01

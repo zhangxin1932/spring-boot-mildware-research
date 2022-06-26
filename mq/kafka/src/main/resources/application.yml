@@ -1,0 +1,7 @@
+server:
+  port: 8001
+spring:
+  kafka:
+    bootstrap-servers: "192.168.0.156:9092"
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer

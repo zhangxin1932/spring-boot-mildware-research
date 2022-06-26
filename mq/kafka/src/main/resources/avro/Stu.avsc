@@ -1,0 +1,22 @@
+{
+    "namespace": "com.zy.entity",
+    "name": "Stu",
+    "type": "record",
+    "fields": [
+        {
+            "name": "id",
+            "type": "int",
+            "doc": "学生 id"
+        },
+        {
+            "name": "name",
+            "type": "string",
+            "doc": "学生姓名"
+        },
+        {
+            "name": "age",
+            "type": "int",
+            "doc": "学生年龄"
+        }
+    ]
+}
