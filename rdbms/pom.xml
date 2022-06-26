@@ -16,6 +16,7 @@
         <module>rdbms-dbutils</module>
         <module>rdbms-sharding-mybatis</module>
         <module>rdbms-multi-datasource</module>
+        <module>rdbms-jpa-dsl</module>
     </modules>
 
 
