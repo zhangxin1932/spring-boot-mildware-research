@@ -12,6 +12,8 @@
         <module>netty</module>
         <module>mongodb</module>
         <module>solr</module>
+        <module>rdbms</module>
+        <module>redis</module>
     </modules>
 
     <dependencyManagement>
