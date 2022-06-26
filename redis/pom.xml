@@ -11,6 +11,11 @@
 
     <groupId>com.zy.spring.mildware.redis</groupId>
     <artifactId>redis</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>spring</module>
+        <module>redisson</module>
+    </modules>
 
 
 </project>

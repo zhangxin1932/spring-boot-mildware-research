@@ -1,0 +1,5 @@
+spring:
+  redis:
+    host: 192.168.0.156
+    port: 6379
+    lockKeyPrefix: lock_key_prefix
