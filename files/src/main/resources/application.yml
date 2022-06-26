@@ -1,0 +1,17 @@
+server:
+  port: 8001
+spring:
+  redis:
+    host: 192.168.0.156
+    port: 6379
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2000MB
+      max-request-size: 2000MB
+breakpoint:
+  upload:
+    dir: E:/data0/uploads/
+    #1024*1024=1 048 576,5M=5 242 880
+    # 这个值请与 index.html 中的值设置为一样的, 该值设置过大, 耗内存; 设置过小, 巨耗磁盘!!!
+    chunkSize: 10485760

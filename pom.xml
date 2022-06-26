@@ -15,6 +15,7 @@
         <module>rdbms</module>
         <module>redis</module>
         <module>mq</module>
+        <module>files</module>
     </modules>
 
     <dependencyManagement>
