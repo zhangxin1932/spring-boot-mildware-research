@@ -19,11 +19,13 @@ public class TestServiceA {
     @BeforeMethod
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        BDDMockito.mockStatic(ServiceA.class);
     }
 
     @Test
     public void testHiA() {
         BDDMockito.when(serviceB.hi(BDDMockito.anyString())).thenReturn("123");
+        BDDMockito.when(ServiceA.f1(BDDMockito.anyString())).thenReturn("word");
         log.info(serviceA.hi("456"));
     }
 

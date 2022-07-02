@@ -10,6 +10,10 @@ public class ServiceA {
     private ServiceB serviceB;
 
     public String hi(String msg) {
-        return "A:" + serviceB.hi(msg);
+        return "A:" + serviceB.hi(msg) + f1(msg);
+    }
+
+    public static String f1(String msg) {
+        return "; static:" + msg;
     }
 }
