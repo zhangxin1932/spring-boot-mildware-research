@@ -1,4 +1,4 @@
-package com.zy.spring.mildware.test.spring.boot;
+package com.zy.spring.mildware.test.spring.boot.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zy.spring.mildware.test.spring.boot.entity.TbUser;
