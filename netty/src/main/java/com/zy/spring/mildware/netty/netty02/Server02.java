@@ -27,7 +27,7 @@ public class Server02 {
         ServerBootstrap server = new ServerBootstrap();
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("server-bossGroup", true));
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors(), new DefaultThreadFactory("server-workerGroup", true));
-
+        ServerHandler02 serverHandler02 = new ServerHandler02();
         try {
             server.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -41,7 +41,7 @@ public class Server02 {
                                     .addLast("$_delimiterBasedFrameDecoder", new DelimiterBasedFrameDecoder(4096, Unpooled.copiedBuffer(DELIMITER_SEPARATOR.getBytes(StandardCharsets.UTF_8))))
                                     .addLast("stringDecoder", new StringDecoder())
                                     .addLast("stringEncoder", new StringEncoder())
-                                    .addLast(new ServerHandler02());
+                                    .addLast(serverHandler02);
                         }
                     });
 

@@ -24,7 +24,7 @@ public class Server03 {
         // 3.当 worker 存在, boss 的 nThreads > 1 时,  server.group(boss, worker) 是 Reactor 的主从线程模型
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(new DefaultThreadFactory("bossGroupExecutor", true));
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(new DefaultThreadFactory("bossGroupExecutor", true));
-
+        ServerHandler03 serverHandler03 = new ServerHandler03();
         try {
             server.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -41,7 +41,7 @@ public class Server03 {
                                     .addLast(new ProtobufDecoder(DataInfo.Message.getDefaultInstance()))
                                     .addLast(new ProtobufVarint32LengthFieldPrepender())
                                     .addLast(new ProtobufEncoder())
-                                    .addLast(new ServerHandler03());
+                                    .addLast(serverHandler03);
                         }
                     });
 

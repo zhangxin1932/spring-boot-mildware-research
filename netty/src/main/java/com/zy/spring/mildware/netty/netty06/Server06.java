@@ -52,6 +52,7 @@ public class Server06 {
 
     private void start() {
         try {
+            BusinessServerHandler businessServerHandler = new BusinessServerHandler();
             server.group(acceptorGroup, ioGroup)
                     .channel(NioServerSocketChannel.class)
                     .childOption(ChannelOption.TCP_NODELAY, true)
@@ -63,7 +64,7 @@ public class Server06 {
                                     .addLast(new StringDecoder())
                                     .addLast(new StringEncoder())
                                     .addLast(new IdleStateHandler(180L, 0L, 0L, TimeUnit.SECONDS))
-                                    .addLast(new BusinessServerHandler());
+                                    .addLast(businessServerHandler);
                         }
                     });
 
