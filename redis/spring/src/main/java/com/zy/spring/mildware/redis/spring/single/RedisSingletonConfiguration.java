@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.integration.redis.util.RedisLockRegistry;
+import redis.clients.jedis.JedisPool;
 
 @Configuration
 @ConditionalOnExpression("'${spring.profiles.active}'.equals('redis-single')")
@@ -21,6 +22,13 @@ public class RedisSingletonConfiguration {
 
     @Value("${spring.redis.lockKeyPrefix}")
     private String redisLockKeyPrefix;
+
+    /////////////////////////////// 这一部分是 jedis 客户端 ///////////////////////////////
+    @Bean
+    public JedisPool jedisPool() {
+        // 启动类上加 @EnableCaching
+        return new JedisPool(host, port);
+    }
 
     @Bean
     public RedisLockRegistry springRedisLockRegistry(RedisConnectionFactory connectionFactory) {
