@@ -1,0 +1,2 @@
+org.springframework.boot.SpringApplicationRunListener=\
+com.zy.spring.mildware.misc.threadpool.listener.DbAndRpcHealthCheckListener
