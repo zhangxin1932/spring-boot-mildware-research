@@ -15,11 +15,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 3.单生产者多消费者
- * 单生产者多消费者，多消费者对于消息m独立消费。
+ * 6.单生产者多消费者
+ * 消费者1、2不重复消费消息，
+ * 消费者3、4消费消费者1或2消费过的消息，且独立重复消费。
+ * 消费者5消费消费者3、4均消费过的消息。
  *
  */
-public class OneProducerMoreConsumer03 {
+public class OneProducerMoreConsumer06 {
 
     public static void main(String[] args) throws Exception {
         Disruptor<Order> disruptor = null;
@@ -27,11 +29,13 @@ public class OneProducerMoreConsumer03 {
             EventFactory<Order> factory = new OrderFactory();
             int ringBufferSize = 1024 * 1024;
             disruptor = new Disruptor<>(factory, ringBufferSize, Executors.defaultThreadFactory(), ProducerType.SINGLE, new YieldingWaitStrategy());
-            /*
-             * 两个消费者创建EventHandlerGroup。该消费者需要实现EventHandler类。两个消费者对于RingBuffer中的每个消息，都独立消费一次。
-             * 两个消费者在消费消息的过程中，各自独立，不产生竞争。
-             */
-            disruptor.handleEventsWith(new OrderHandler("1"), new OrderHandler("2"));
+            // 单生产者，多消费者模式。
+            // 消费者1、2不重复消费消息，
+            // 消费者3、4消费消费者1或2消费过的消息，且独立重复消费。
+            // 消费者5消费消费者3、4均消费过的消息。
+            disruptor.handleEventsWithWorkerPool(new OrderHandler("1"), new OrderHandler("2"))
+                    .then(new OrderHandler("3"), new OrderHandler("4"))
+                    .then(new OrderHandler("5"));
             disruptor.start();
 
             // 单个生产者, 生产数据

@@ -15,11 +15,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 3.单生产者多消费者
- * 单生产者多消费者，多消费者对于消息m独立消费。
+ * 4.单生产者多消费者
+ * 单生产者，多消费者间存在依赖关系的模式。
+ * 消费者1、2消息独立消费。
+ * 消费者3、4仅能消费1、2均消费过的消息，消费者5仅能消费3、4均消费过的消息
  *
  */
-public class OneProducerMoreConsumer03 {
+public class OneProducerMoreConsumer04 {
 
     public static void main(String[] args) throws Exception {
         Disruptor<Order> disruptor = null;
@@ -27,11 +29,10 @@ public class OneProducerMoreConsumer03 {
             EventFactory<Order> factory = new OrderFactory();
             int ringBufferSize = 1024 * 1024;
             disruptor = new Disruptor<>(factory, ringBufferSize, Executors.defaultThreadFactory(), ProducerType.SINGLE, new YieldingWaitStrategy());
-            /*
-             * 两个消费者创建EventHandlerGroup。该消费者需要实现EventHandler类。两个消费者对于RingBuffer中的每个消息，都独立消费一次。
-             * 两个消费者在消费消息的过程中，各自独立，不产生竞争。
-             */
-            disruptor.handleEventsWith(new OrderHandler("1"), new OrderHandler("2"));
+            //相当于在各个EventHandlerGroup之间进行级联，形成依赖关系。
+            disruptor.handleEventsWith(new OrderHandler("1"), new OrderHandler("2"))
+                    .then(new OrderHandler("3"), new OrderHandler("4"))
+                    .then(new OrderHandler("5"));
             disruptor.start();
 
             // 单个生产者, 生产数据

@@ -16,12 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 3.单生产者多消费者
- * 多消费者间形成依赖关系，每个依赖节点只有一个消费者。
- * 多消费者对于消息重复消费
- *
- * C1 --> C2/C3 --> C4
- * 消费者C2、C3只有在C1消费完消息m后，才能消费m。
- * 消费者C4只有在C2、C3消费完m后，才能消费该消息。
+ * 调用handleEventsWithWorkerPool形成WorkerPool，并进一步封装成EventHandlerGroup。
+ * 对于同一条消息，两消费者不重复消费。
  */
 public class OneProducerMoreConsumer02 {
 
@@ -32,10 +28,12 @@ public class OneProducerMoreConsumer02 {
             int ringBufferSize = 1024 * 1024;
             disruptor = new Disruptor<>(factory, ringBufferSize, Executors.defaultThreadFactory(), ProducerType.SINGLE, new YieldingWaitStrategy());
 
-            // 多个消费者间形成依赖关系，每个依赖节点的消费者为单线程。
-            disruptor.handleEventsWith(new OrderHandler("C1"))
-                    .then(new OrderHandler("C2"), new OrderHandler("C3"))
-                    .then(new OrderHandler("C4"));
+            /*
+             * 该方法传入的消费者需要实现WorkHandler接口，方法的内部实现是：先创建WorkPool，然后封装WorkPool为EventHandlerPool返回。
+             * 消费者1、2对于消息的消费有时有竞争，保证同一消息只能有一个消费者消费
+             */
+            disruptor.handleEventsWithWorkerPool(new OrderHandler("1"),
+                    new OrderHandler("2"));
             disruptor.start();
 
             // 单个生产者, 生产数据
