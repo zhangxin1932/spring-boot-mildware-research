@@ -130,7 +130,7 @@ public class WebSocketServer {
 
     @PostConstruct
     public void init() {
-        System.out.println("websocket 加载");
+        /*System.out.println("websocket 加载");
 
         // 这里启动定时任务, 主动向客户端推送消息
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new DefaultThreadFactory("webSocketServer"));
@@ -141,7 +141,7 @@ public class WebSocketServer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }, 5L, 1L, TimeUnit.SECONDS);
+        }, 5L, 1L, TimeUnit.SECONDS);*/
     }
 
 }

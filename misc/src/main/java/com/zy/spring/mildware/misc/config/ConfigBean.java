@@ -25,10 +25,10 @@ public class ConfigBean {
     @Value("#{@systemProperties}")
     private Map<String, Object> v1;
 
-    @Bean
+    /*@Bean
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();
-    }
+    }*/
 
     @Bean(value = "methodInvokingFactoryBean")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
