@@ -9,11 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.zy.spring.mildware.logs</groupId>
-    <artifactId>logs</artifactId>
+    <groupId>com.zy.spring.mildware.logsxyz</groupId>
+    <artifactId>logs-xyz</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>logback</module>
+        <module>log4j2-xyz</module>
+        <module>logbackxyz</module>
     </modules>
 
 

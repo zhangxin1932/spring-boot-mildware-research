@@ -6,7 +6,7 @@
     <!--<springProperty scope="context" name="LOG_HOME" source="logback.logHome" defaultValue="zxlog"/>
     <springProperty scope="context" name="LOG_NAME_PREFIX" source="spring.application.name" defaultValue=""/>-->
     <property scope="context" name="LOG_HOME" value="zxlog"/>
-    <property scope="context" name="LOG_NAME_PREFIX" value="prefix"/>
+    <property scope="context" name="LOG_NAME_PREFIX" value="tips"/>
     <!-- %m输出的信息,%p日志级别,%t线程名,%d日期,%c类的全名,%i索引【从数字0开始递增】,,, -->
     <property scope="context" name="pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %level %logger{35}:%line - %msg%n"/>
     <timestamp scope="context" key="bySecond" datePattern="yyyyMMddHHmmss"/>

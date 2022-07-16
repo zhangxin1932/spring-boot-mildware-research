@@ -1,14 +1,11 @@
-package com.zy.spring.mildware.logs.logback.test;
+package com.zy.spring.mildware.logsxyz.logbackxyz.test;
 
-import com.zy.spring.mildware.logs.logback.context.LogbackContext;
+import com.zy.spring.mildware.logsxyz.logbackxyz.context.LogbackContext;
 
-import java.util.concurrent.Executors;
-
-public class CardLog {
+public class BannerLog {
 
     public static void main(String[] args) {
-
-        LogbackContext.setLogger(CardLog.class);
+        LogbackContext.setLogger(BannerLog.class);
 
         for (int i = 0; i < 10; i++) {
             int finalI = i;
@@ -17,7 +14,6 @@ public class CardLog {
                         LogbackContext.get().info("-------> " + String.valueOf(finalI));
                     /*});*/
         }
-
     }
 
 }

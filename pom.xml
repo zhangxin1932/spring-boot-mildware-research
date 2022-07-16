@@ -21,7 +21,7 @@
         <module>test</module>
         <module>security</module>
         <module>misc</module>
-        <module>logs</module>
+        <module>logs-xyz</module>
     </modules>
 
     <dependencyManagement>

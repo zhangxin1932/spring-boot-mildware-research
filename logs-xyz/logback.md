@@ -21,3 +21,6 @@ logback 在替换变量时，首先搜索 local 变量，然后搜索 context，
 在spring项目中，应将变量的作用域设置为context，并交给spring控制
 ```
 
+
+https://www.cnblogs.com/Hlingoes/articles/13097144.html
+
