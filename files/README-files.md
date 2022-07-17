@@ -14,3 +14,9 @@ excel: easyexcel
 pdf: 
 word: 
 ```
+
+文件在线预览优秀项目
+```
+https://gitee.com/kekingcn/file-online-preview
+https://file.keking.cn/index
+```
