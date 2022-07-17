@@ -57,11 +57,67 @@ db.stus.find();
 
 ## 2.2 查询命令
 ```
-db.stus.find({name:"小猪"}); // 查询特定属性的对象
-db.stus.findOne({name:"小猪"}); // 查询集合中符合条件的第一个文档
+// 1.查询特定属性的对象
+db.stus.find({name:"小猪"});
+// 2.查询集合中符合条件的第一个文档
+db.stus.findOne({name:"小猪"});
 findOne直接返回的是一个对象。而find返回的是一个数组。
 注意，db.stus.find({name:"小猪"})[0];可以选择数组中具体的对象。
-db.stus.find({age:28}).count(); // 统计查询数量
+// 3.统计查询数量
+db.stus.find({age:28}).count();
+// 4.比如查询满足status是数组[A,D]中的记录
+db.inventory.find( { status: { $in: [ "A", "D" ] } } )
+// 5.AND 条件查询:直接在find函数指定多个字段满足即可，这样就是 and 条件。
+// 比如下面语句就是 status 为 A，qty 小于 30
+db.inventory.find( { status: "A", qty: { $lt: 30 } } )
+// 6.OR 条件查询
+db.inventory.find( { $or: [ { status: "A" }, { qty: { $lt: 30 } } ] } )
+// 7.OR 和 AND 集合一起
+db.inventory.find( {
+     status: "A",
+     $or: [ { qty: { $lt: 30 } }, { item: /^p/ } ]
+} )
+// 8.条件查询不等于
+db.people.find(
+    { status: { $ne: "A" } }
+)
+// 9.条件查询大于 >
+db.people.find(
+    { age: { $gt: 25 } }
+)
+// 10.条件查询小于 <
+db.people.find(
+   { age: { $lt: 25 } }
+)
+// 11.复杂的条件查询, 同时包含大于以及小于
+db.people.find(
+   { age: { $gt: 25, $lte: 50 } }
+)
+// 12.条件查询(正则) LIKE
+db.people.find( { user_id: /bc/ } )
+db.people.find( { user_id: { $regex: /bc/ } } )
+db.people.find( { user_id: /^bc/ } )
+db.people.find( { user_id: { $regex: /^bc/ } } )
+// 13.排序(升序)
+db.people.find( { status: "A" } ).sort( { user_id: 1 } )
+// 14.降序
+db.people.find( { status: "A" } ).sort( { user_id: -1 } )
+// 15.统计数量
+db.people.count()
+db.people.find().count()
+// 16.存在某个字段
+db.people.find( { user_id: { $exists: true } } ).count()
+// 17.去重:去除重复distinct
+db.people.distinct( "status" )
+// 18.分页
+db.people.find().limit(5).skip(10)
+db.people.find().limit(1)
+// 19.EXPLAIN:执行计划
+db.people.find( { status: "A" } ).explain()
+
+
+================= 聚合查询 ==================
+https://www.jianshu.com/p/dbf965f8d314
 ```
 
 ## 2.3 更新命令
