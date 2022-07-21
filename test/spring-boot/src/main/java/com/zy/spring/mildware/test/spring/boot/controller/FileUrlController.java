@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * https://www.cnblogs.com/quintanliu/p/13423292.html
+ */
 @Controller
 @RequestMapping("/files/")
 public class FileUrlController {
