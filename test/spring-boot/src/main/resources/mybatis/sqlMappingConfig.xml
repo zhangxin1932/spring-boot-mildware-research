@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--设置全局配置环境-->
+    <settings>
+<!--        &lt;!&ndash;开启全局缓存&ndash;&gt;
+        <setting name="cacheEnabled" value="true"/>
+        &lt;!&ndash;开启懒加载&ndash;&gt;
+        <setting name="lazyLoadingEnabled" value="true"/>
+        &lt;!&ndash;关闭延迟加载&ndash;&gt;
+        <setting name="aggressiveLazyLoading" value="false"/>-->
+        <!-- 打印查询语句 -->
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+    </settings>
+    <!--配置分页插件pageHelper的拦截器：5.0版本之后的配置-->
+    <!--<plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+    </plugins>-->
+</configuration>

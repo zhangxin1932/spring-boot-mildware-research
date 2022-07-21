@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Configuration
+//@Configuration
 public class StaticResourceConfig implements WebMvcConfigurer {
 
     @Override
