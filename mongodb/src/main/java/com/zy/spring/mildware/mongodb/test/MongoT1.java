@@ -39,9 +39,11 @@ public class MongoT1 {
         // BasicDBObject query = new BasicDBObject("status", new BasicDBObject("$regex", pattern));
         // 3.查找时间小于某个值的记录，这里时间类型是：ISODate，即插入时用的是 new Date();
         // 强烈建议用 Long 型的时间戳
-        LocalDateTime localDateTime = LocalDateTime.of(2022, 10, 14, 20, 59, 21);
-        Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-        BasicDBObject query = new BasicDBObject("createTime", new BasicDBObject("$lt", date));
+        /*LocalDateTime localDateTime = LocalDateTime.of(2022, 10, 14, 20, 59, 21);
+        Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());*/
+        // 这里小时数是 12，减去了8 小时
+        LocalDateTime localDateTime = LocalDateTime.of(2022, 10, 14, 12, 59, 21);
+        BasicDBObject query = new BasicDBObject("createTime", new BasicDBObject("$lt", localDateTime));
 
         // 3.排序
         BasicDBObject sort = new BasicDBObject("createTime", -1);
