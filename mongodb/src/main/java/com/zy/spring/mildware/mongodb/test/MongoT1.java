@@ -38,7 +38,7 @@ public class MongoT1 {
         // 2.查找包含某个正则的数据
         // BasicDBObject query = new BasicDBObject("status", new BasicDBObject("$regex", pattern));
         // 3.查找时间小于某个值的记录，这里时间类型是：ISODate，即插入时用的是 new Date();
-        // 强烈建议用 Long 型的时间戳
+        // 强烈建议用 Long 型的时间戳：也方便跨语言使用
         /*LocalDateTime localDateTime = LocalDateTime.of(2022, 10, 14, 20, 59, 21);
         Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());*/
         // 这里小时数是 12，减去了8 小时

@@ -10,7 +10,7 @@ public class SolrConfig {
     @Bean
     public HttpSolrClient solrClient() {
         return new HttpSolrClient.Builder()
-                .withBaseSolrUrl("http://127.0.0.1:8983/solr")
+                .withBaseSolrUrl("http://10.102.224.206:8983/solr")
                 .build();
     }
 
