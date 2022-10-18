@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.json.DomainMap;
 import org.apache.solr.client.solrj.request.json.JsonFacetMap;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
@@ -25,10 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/c1/")
@@ -83,7 +81,16 @@ public class SolrC1Controller {
      * @throws Exception
      */
     @RequestMapping("jsonFacetQuery")
-    public Object jsonFacetQuery() throws Exception {
+    public Object jsonFacetQuery(String fn) throws Exception {
+        if (Objects.equals(fn, "f1")) {
+            return f1();
+        } else if (Objects.equals(fn, "f2")) {
+            return f2();
+        }
+        return null;
+    }
+
+    private Object f1() throws Exception {
         TermsFacetMap termsFacetMap = new TermsFacetMap("name");
         termsFacetMap.setLimit(5);
         termsFacetMap.setMinCount(7);
@@ -105,7 +112,37 @@ public class SolrC1Controller {
             long count = bucket.getCount();
             map.put(val.toString(), count);
         }
+        return map;
+    }
 
+    private Object f2() throws Exception {
+        final TermsFacetMap nameFacet = new TermsFacetMap("name")
+                .setLimit(2);
+        final TermsFacetMap allManufacturersFacet = new TermsFacetMap("manu_id_s")
+                .setLimit(2)
+                //.withDomain(new DomainMap().withTagsToExclude("MANU"))
+                ;
+        final JsonQueryRequest request = new JsonQueryRequest()
+                //.setQuery("cat:electronics")
+                .setQuery("*:*")
+                //.withFilter("{!tag=MANU}manu_id_s:apple")
+                .withFacet("name", nameFacet)
+                .withFacet("manufacturers", allManufacturersFacet);
+        QueryResponse queryResponse = request.process(solrClient, SolrCoreEnum.c1.name());
+        NestableJsonFacet jsonFacetingResponse = queryResponse.getJsonFacetingResponse();
+        Set<String> bucketBasedFacetNames = jsonFacetingResponse.getBucketBasedFacetNames();
+        Map<String, Map<String, Long>> map = new HashMap<>();
+        for (String bucketBasedFacetName : bucketBasedFacetNames) {
+            BucketBasedJsonFacet bucketBasedFacets = jsonFacetingResponse.getBucketBasedFacets(bucketBasedFacetName);
+            List<BucketJsonFacet> buckets = bucketBasedFacets.getBuckets();
+            Map<String, Long> subMap = new HashMap<>();
+            for (BucketJsonFacet bucket : buckets) {
+                Object val = bucket.getVal();
+                long count = bucket.getCount();
+                subMap.put(val.toString(), count);
+            }
+            map.put(bucketBasedFacetName, subMap);
+        }
         return map;
     }
 
