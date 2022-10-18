@@ -9,8 +9,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.json.JsonFacetMap;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.client.solrj.request.json.TermsFacetMap;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
+import org.apache.solr.client.solrj.response.json.BucketJsonFacet;
 import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/c1/")
@@ -50,6 +60,7 @@ public class SolrC1Controller {
 
     /**
      * https://www.thinbug.com/q/39891895
+     * https://blog.csdn.net/zteny/article/details/73731958
      * json.facet
      * facet
      *
@@ -64,6 +75,38 @@ public class SolrC1Controller {
         QueryResponse response = solrClient.query(SolrCoreEnum.c1.name(), query);
         NestableJsonFacet jsonFacetingResponse = response.getJsonFacetingResponse();
         return response;
+    }
+
+    /**
+     * https://solr.apache.org/guide/8_3/json-facet-api.html
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("jsonFacetQuery")
+    public Object jsonFacetQuery() throws Exception {
+        TermsFacetMap termsFacetMap = new TermsFacetMap("name");
+        termsFacetMap.setLimit(5);
+        termsFacetMap.setMinCount(7);
+        // termsFacetMap.setSort("desc");
+        final JsonQueryRequest request = new JsonQueryRequest()
+                .setQuery("*:*")
+                .setLimit(0)
+                .withFacet("categories", termsFacetMap);
+        QueryResponse queryResponse = request.process(solrClient, SolrCoreEnum.c1.name());
+        SolrDocumentList results = queryResponse.getResults();
+        NestableJsonFacet jsonFacetingResponse = queryResponse.getJsonFacetingResponse();
+        Set<String> bucketBasedFacetNames = jsonFacetingResponse.getBucketBasedFacetNames();
+        Set<String> statNames = jsonFacetingResponse.getStatNames();
+        BucketBasedJsonFacet bucketBasedFacets = jsonFacetingResponse.getBucketBasedFacets(bucketBasedFacetNames.iterator().next());
+        List<BucketJsonFacet> buckets = bucketBasedFacets.getBuckets();
+        Map<String, Long> map = new HashMap<>();
+        for (BucketJsonFacet bucket : buckets) {
+            Object val = bucket.getVal();
+            long count = bucket.getCount();
+            map.put(val.toString(), count);
+        }
+
+        return map;
     }
 
     @RequestMapping("getHmaData")
