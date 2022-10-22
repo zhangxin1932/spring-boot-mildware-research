@@ -1223,7 +1223,7 @@ removeregex: 同remove类似，只不过是通过正则表达式来匹配多个�
 
 
 
-
+https://www.pianshen.com/article/4136495037/ (jsonfacet分组聚合 unique计数不准确)
 https://blog.csdn.net/MeiX505/article/details/78469618
 https://www.cnblogs.com/xiaostudy/p/12758750.html
 https://bbs.csdn.net/topics/391884309

@@ -1,6 +1,8 @@
 package com.zy.spring.mildware.solr.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.zy.spring.mildware.solr.common.SolrCoreEnum;
 import com.zy.spring.mildware.solr.entity.MriEntity;
 import org.apache.commons.io.IOUtils;
@@ -9,10 +11,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.request.json.DomainMap;
-import org.apache.solr.client.solrj.request.json.JsonFacetMap;
-import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
-import org.apache.solr.client.solrj.request.json.TermsFacetMap;
+import org.apache.solr.client.solrj.request.json.*;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
@@ -21,6 +20,7 @@ import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.io.InputStream;
@@ -86,8 +86,85 @@ public class SolrC1Controller {
             return f1();
         } else if (Objects.equals(fn, "f2")) {
             return f2();
+        } else if (Objects.equals(fn, "f3")) {
+            return f3();
         }
         return null;
+    }
+
+    /**
+     * {"query":"*:*","limit":0,"facet":{"atcCodeFacet":{"field":"atcCodes","mincount":7,"limit":5,"type":"terms","facet":{"count_outcome":"unique(outcome)"}},"maHolderFacet":{"field":"maHolder","mincount":8,"limit":5,"type":"terms"}}}
+     *
+     * {
+     *   "query": "*:*",
+     *   "limit": 0,
+     *   "facet": {
+     *     "atcCodeFacet": {
+     *       "field": "atcCodes",
+     *       "mincount": 7,
+     *       "limit": 5,
+     *       "type": "terms",
+     * 	  "facet": {
+     * 		"count_outcome": "unique(outcome)"
+     *            }
+     *     },
+     * 	"maHolderFacet": {
+     *       "field": "maHolder",
+     *       "mincount": 8,
+     *       "limit": 5,
+     *       "type": "terms"
+     *     }
+     *   }
+     * }
+     *
+     * @return
+     * @throws Exception
+     */
+    private Object f3() throws Exception {
+        final JsonQueryRequest request = new JsonQueryRequest()
+                .setQuery("*:*")
+                .setLimit(0)
+                .withFacet("atcCodeFacet",
+                        new TermsFacetMap("atcCodes").setLimit(5).setMinCount(7)
+                                .withStatSubFacet("count_outcome", "unique(outcome)"))
+                .withFacet("maHolderFacet",
+                        new TermsFacetMap("maHolder").setLimit(5).setMinCount(8))
+                ;
+        return parse(request);
+    }
+
+    private Object parse(JsonQueryRequest request) throws Exception {
+        QueryResponse queryResponse = request.process(solrClient, SolrCoreEnum.c1.name());
+        SolrDocumentList results = queryResponse.getResults();
+        NestableJsonFacet jsonFacetingResponse = queryResponse.getJsonFacetingResponse();
+        Set<String> bucketBasedFacetNames = jsonFacetingResponse.getBucketBasedFacetNames();
+        Set<String> statNames = jsonFacetingResponse.getStatNames();
+
+        List<JSONObject> finalResp = Lists.newArrayList();
+        bucketBasedFacetNames.forEach(bucketBasedFacetName -> {
+            BucketBasedJsonFacet bucketBasedFacets = jsonFacetingResponse.getBucketBasedFacets(bucketBasedFacetName);
+            List<BucketJsonFacet> buckets = bucketBasedFacets.getBuckets();
+            List<JSONObject> resp = Lists.newArrayList();
+            for (BucketJsonFacet bucket : buckets) {
+                JSONObject jsonObject = new JSONObject();
+                Object val = bucket.getVal();
+                if (Objects.nonNull(val)) {
+                    String value = val.toString();
+                    jsonObject.put(value, bucket.getCount());
+                    Set<String> statNamesSet = bucket.getStatNames();
+                    if (!CollectionUtils.isEmpty(statNamesSet)) {
+                        statNamesSet.forEach(e -> {
+                            jsonObject.put(e, bucket.getStatValue(e));
+                        });
+                    }
+                }
+                resp.add(jsonObject);
+            }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(bucketBasedFacetName, resp);
+            finalResp.add(jsonObject);
+        });
+        return finalResp;
     }
 
     private Object f1() throws Exception {
@@ -99,20 +176,7 @@ public class SolrC1Controller {
                 .setQuery("*:*")
                 .setLimit(0)
                 .withFacet("categories", termsFacetMap);
-        QueryResponse queryResponse = request.process(solrClient, SolrCoreEnum.c1.name());
-        SolrDocumentList results = queryResponse.getResults();
-        NestableJsonFacet jsonFacetingResponse = queryResponse.getJsonFacetingResponse();
-        Set<String> bucketBasedFacetNames = jsonFacetingResponse.getBucketBasedFacetNames();
-        Set<String> statNames = jsonFacetingResponse.getStatNames();
-        BucketBasedJsonFacet bucketBasedFacets = jsonFacetingResponse.getBucketBasedFacets(bucketBasedFacetNames.iterator().next());
-        List<BucketJsonFacet> buckets = bucketBasedFacets.getBuckets();
-        Map<String, Long> map = new HashMap<>();
-        for (BucketJsonFacet bucket : buckets) {
-            Object val = bucket.getVal();
-            long count = bucket.getCount();
-            map.put(val.toString(), count);
-        }
-        return map;
+        return parse(request);
     }
 
     private Object f2() throws Exception {
@@ -128,22 +192,7 @@ public class SolrC1Controller {
                 //.withFilter("{!tag=MANU}manu_id_s:apple")
                 .withFacet("name", nameFacet)
                 .withFacet("manufacturers", allManufacturersFacet);
-        QueryResponse queryResponse = request.process(solrClient, SolrCoreEnum.c1.name());
-        NestableJsonFacet jsonFacetingResponse = queryResponse.getJsonFacetingResponse();
-        Set<String> bucketBasedFacetNames = jsonFacetingResponse.getBucketBasedFacetNames();
-        Map<String, Map<String, Long>> map = new HashMap<>();
-        for (String bucketBasedFacetName : bucketBasedFacetNames) {
-            BucketBasedJsonFacet bucketBasedFacets = jsonFacetingResponse.getBucketBasedFacets(bucketBasedFacetName);
-            List<BucketJsonFacet> buckets = bucketBasedFacets.getBuckets();
-            Map<String, Long> subMap = new HashMap<>();
-            for (BucketJsonFacet bucket : buckets) {
-                Object val = bucket.getVal();
-                long count = bucket.getCount();
-                subMap.put(val.toString(), count);
-            }
-            map.put(bucketBasedFacetName, subMap);
-        }
-        return map;
+        return parse(request);
     }
 
     @RequestMapping("getHmaData")

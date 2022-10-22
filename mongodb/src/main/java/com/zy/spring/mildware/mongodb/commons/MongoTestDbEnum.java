@@ -10,6 +10,7 @@ public enum MongoTestDbEnum {
      * db1
      */
     db1("db1"),
+    mri("mri"),
 
     ;
 
