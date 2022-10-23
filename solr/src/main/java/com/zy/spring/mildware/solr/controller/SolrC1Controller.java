@@ -17,8 +17,10 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
 import org.apache.solr.client.solrj.response.json.BucketJsonFacet;
 import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.util.NamedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,6 +79,8 @@ public class SolrC1Controller {
 
     /**
      * https://solr.apache.org/guide/8_3/json-facet-api.html
+     *
+     * 这里的数据，参见：{@link com.zy.spring.mildware.mongodb.test.MongoT1#f5()}
      * @return
      * @throws Exception
      */
@@ -88,8 +92,30 @@ public class SolrC1Controller {
             return f2();
         } else if (Objects.equals(fn, "f3")) {
             return f3();
+        } else if (Objects.equals(fn, "f4")) {
+            return f4();
         }
         return null;
+    }
+
+    private Object f4() throws Exception {
+        final JsonQueryRequest request = new JsonQueryRequest();
+        // outcome 不是 Positive 的
+        request.setQuery("-outcome:Positive");
+        // fl 参数
+        request.returnFields("id", "name", "outcome", "dateOfOutcome");
+        // 偏移量
+        request.setOffset(0);
+        // 分页数量
+        request.setLimit(5);
+        // 排序
+        request.setSort("dateOfOutcome desc");
+        QueryResponse queryResponse = request.process(solrClient, SolrCoreEnum.c1.name());
+        // 结果集
+        SolrDocumentList results = queryResponse.getResults();
+        // 结果总数: 可以参考 solr 管理台的返回的数据结构来通过代码获取对应的属性值
+        long numFound = results.getNumFound();
+        return results;
     }
 
     /**
