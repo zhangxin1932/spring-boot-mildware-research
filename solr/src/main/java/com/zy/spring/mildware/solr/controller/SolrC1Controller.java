@@ -93,28 +93,36 @@ public class SolrC1Controller {
     }
 
     /**
-     * {"query":"*:*","limit":0,"facet":{"atcCodeFacet":{"field":"atcCodes","mincount":7,"limit":5,"type":"terms","facet":{"count_outcome":"unique(outcome)"}},"maHolderFacet":{"field":"maHolder","mincount":8,"limit":5,"type":"terms"}}}
+     * {"query":"*:*","limit":0,"facet":{"atcCodeFacet":{"field":"atcCodes","mincount":7,"limit":5,"type":"terms","facet":{"count_outcome":"unique(outcome)"}},"maHolderFacet":{"field":"maHolder","mincount":8,"limit":5,"sort":"count desc","type":"terms"},"by_id":{"q":"outcome:Positive","type":"query","facet":{"by_id_count":"unique(id)"}}}}
      *
      * {
-     *   "query": "*:*",
-     *   "limit": 0,
-     *   "facet": {
-     *     "atcCodeFacet": {
-     *       "field": "atcCodes",
-     *       "mincount": 7,
-     *       "limit": 5,
-     *       "type": "terms",
-     * 	  "facet": {
-     * 		"count_outcome": "unique(outcome)"
-     *            }
-     *     },
-     * 	"maHolderFacet": {
-     *       "field": "maHolder",
-     *       "mincount": 8,
-     *       "limit": 5,
-     *       "type": "terms"
+     *     "query": "*:*",
+     *     "limit": 0,
+     *     "facet": {
+     *         "atcCodeFacet": {
+     *             "field": "atcCodes",
+     *             "mincount": 7,
+     *             "limit": 5,
+     *             "type": "terms",
+     *             "facet": {
+     *                 "count_outcome": "unique(outcome)"
+     *             }
+     *         },
+     *         "maHolderFacet": {
+     *             "field": "maHolder",
+     *             "mincount": 8,
+     *             "limit": 5,
+     *             "sort": "count desc",
+     *             "type": "terms"
+     *         },
+     *         "by_id": {
+     *             "q": "outcome:Positive",
+     *             "type": "query",
+     *             "facet": {
+     *                 "by_id_count": "unique(id)"
+     *             }
+     *         }
      *     }
-     *   }
      * }
      *
      * @return
@@ -126,9 +134,17 @@ public class SolrC1Controller {
                 .setLimit(0)
                 .withFacet("atcCodeFacet",
                         new TermsFacetMap("atcCodes").setLimit(5).setMinCount(7)
-                                .withStatSubFacet("count_outcome", "unique(outcome)"))
+                                .withStatSubFacet("count_outcome", "unique(outcome)")
+                )
                 .withFacet("maHolderFacet",
-                        new TermsFacetMap("maHolder").setLimit(5).setMinCount(8))
+                        new TermsFacetMap("maHolder").setLimit(5).setMinCount(8).setSort("count desc")
+                )
+                .withFacet("by_id", new QueryFacetMap("outcome:Positive")
+                        .withStatSubFacet("by_id_count", "unique(id)")
+                )
+                /*.withFacet("dateOfOutcomeFacet",
+                        new RangeFacetMap("dateOfOutcome", new Date(2021, 10, 1), new Date(2022, 10, 1), "+1MONTH")
+                )*/
                 ;
         return parse(request);
     }
@@ -141,6 +157,22 @@ public class SolrC1Controller {
         Set<String> statNames = jsonFacetingResponse.getStatNames();
 
         List<JSONObject> finalResp = Lists.newArrayList();
+
+        Set<String> queryFacetNames = jsonFacetingResponse.getQueryFacetNames();
+        queryFacetNames.forEach(queryFacetName -> {
+            NestableJsonFacet queryFacet = jsonFacetingResponse.getQueryFacet(queryFacetName);
+            long count = queryFacet.getCount();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(queryFacetName, count);
+            Set<String> statNamesSet = queryFacet.getStatNames();
+            if (!CollectionUtils.isEmpty(statNamesSet)) {
+                statNamesSet.forEach(e -> {
+                    jsonObject.put(e, queryFacet.getStatValue(e));
+                });
+            }
+            finalResp.add(jsonObject);
+        });
+
         bucketBasedFacetNames.forEach(bucketBasedFacetName -> {
             BucketBasedJsonFacet bucketBasedFacets = jsonFacetingResponse.getBucketBasedFacets(bucketBasedFacetName);
             List<BucketJsonFacet> buckets = bucketBasedFacets.getBuckets();
