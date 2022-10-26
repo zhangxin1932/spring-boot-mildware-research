@@ -94,8 +94,21 @@ public class SolrC1Controller {
             return f3();
         } else if (Objects.equals(fn, "f4")) {
             return f4();
+        } else if (Objects.equals(fn, "f5")) {
+            return f5();
         }
         return null;
+    }
+
+    private Object f5() throws Exception {
+        final JsonQueryRequest request = new JsonQueryRequest()
+                .setQuery("*:*")
+                .setLimit(0)
+                .withFacet("atcCodeFacet",
+                        new TermsFacetMap("atcCodes").setLimit(50).setMinCount(7).setSort("count asc")
+                )
+                ;
+        return parse(request);
     }
 
     private Object f4() throws Exception {
