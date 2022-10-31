@@ -8,10 +8,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.RandomAccessFile;
 import org.apache.pdfbox.pdfparser.PDFParser;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
@@ -38,7 +35,7 @@ import java.util.Objects;
  */
 public class PdfUtils {
 
-    private static final String CDE_PDF_PATH = "D:\\tmp\\pdf\\重组人生长激素注射液（CXSS2101059-62）增加适应症技术审评报告.pdf";
+    private static final String CDE_PDF_PATH = "D:\\tmp\\pdf\\CXSS2101059-62增加适应症技术审评报告.pdf";
     private static final String CDE_PDF_PATH_2 = "D:\\tmp\\pdf\\注射用苯磺酸瑞马唑仑（CXHS2101053）申请上市技术审评报告.pdf";
     private static final String CDE_PDF_OUTPUT_PATH_BY_PDFBOX = "D:\\tmp\\pdf\\重组人生长激素注射液（CXSS2101059-62）增加适应症技术审评报告_pdfbox.txt";
     private static final String CDE_PDF_OUTPUT_PATH_BY_SPIRE = "D:\\tmp\\pdf\\重组人生长激素注射液（CXSS2101059-62）增加适应症技术审评报告_spire.txt";
@@ -48,7 +45,7 @@ public class PdfUtils {
         f5();
     }
 
-    private static void f6() throws Exception {
+    private static void f7() throws Exception {
         writeImg2Pdf(null, "D:\\tmp\\pdf\\hi.pdf", "D:\\tmp\\img\\excel1.jpg");
     }
 
@@ -60,7 +57,7 @@ public class PdfUtils {
      *
      * @throws Exception
      */
-    private static void f5() throws Exception {
+    private static void f6() throws Exception {
         // -f 导出格式，默认 csv
         // -p 只导出哪一页，all是所有
         // path
@@ -70,6 +67,55 @@ public class PdfUtils {
                 , "-p=all"
                 , CDE_PDF_PATH_2
                 , "-l"
+        };
+        DefaultParser parser = new DefaultParser();
+        CommandLine commandLine = parser.parse(CommandLineApp.buildOptions(), args);
+        StringBuilder builder = new StringBuilder();
+        new CommandLineApp(builder, commandLine).extractTables(commandLine);
+        System.out.println(builder.toString());
+        JSONArray array = JSON.parseArray(builder.toString());
+        for (int i = 0; i < array.size(); i++) {
+            JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(array.get(i)));
+            JSONArray data = jsonObject.getJSONArray("data");
+            for (int j = 0; j < data.size(); j++) {
+                JSONArray subArray = JSON.parseArray(JSON.toJSONString(data.get(j)));
+                for (int k = 0; k < subArray.size(); k++) {
+                    JSONObject js = JSON.parseObject(JSON.toJSONString(subArray.get(k)));
+                    String text = normalizeStr(js.getString("text"));
+                    if (StringUtils.equalsIgnoreCase(text, "上市许可持有人")) {
+                        String txt = normalizeStr(JSON.parseObject(JSON.toJSONString(subArray.get(k + 1))).getString("text"));
+                        System.out.println(txt);
+                        break;
+                    }
+                    if (StringUtils.equalsIgnoreCase(text, "通用名")) {
+                        String txt = normalizeStr(JSON.parseObject(JSON.toJSONString(subArray.get(k + 1))).getString("text"));
+                        System.out.println(txt);
+                        break;
+                    }
+                    if (StringUtils.equalsIgnoreCase(text, "完成的临床试验内容")) {
+                        String txt = normalizeStr(JSON.parseObject(JSON.toJSONString(subArray.get(k + 1))).getString("text"));
+                        System.out.println(txt);
+                        break;
+                    }
+                    if (StringUtils.equalsIgnoreCase(text, "优先审评审批")) {
+                        String txt = normalizeStr(JSON.parseObject(JSON.toJSONString(subArray.get(k + 1))).getString("text"));
+                        System.out.println(txt);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private static void f5() throws Exception {
+        // -f 导出格式，默认 csv
+        // -p 只导出哪一页，all是所有
+        // path
+        // -l 强制使用点阵提取 pdf， 关键参数
+        String[] args = {
+                "-f=JSON"
+                , "-p=all"
+                , CDE_PDF_PATH
         };
         DefaultParser parser = new DefaultParser();
         CommandLine commandLine = parser.parse(CommandLineApp.buildOptions(), args);
@@ -205,7 +251,7 @@ public class PdfUtils {
         }
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
         stripper.setSortByPosition(true);
-        Rectangle rectangle = new Rectangle(0, 0, 500, 500);
+        Rectangle rectangle = new Rectangle(0, 0, 1000, 1000);
         stripper.addRegion("applicant", rectangle);
         PDPageTree pages = pdDocument.getDocumentCatalog().getPages();
         for (PDPage page : pages) {
@@ -222,6 +268,19 @@ public class PdfUtils {
      */
     private static void f1() throws Exception {
         PDDocument pdDocument = PDDocument.load(new FileInputStream(new File(CDE_PDF_PATH)));
+        PDDocumentInformation information = pdDocument.getDocumentInformation();
+        System.out.println("----------------------------------------");
+        // 获取 pdf 标题
+        String title = information.getTitle();
+        System.out.println(title);
+        System.out.println(information.getTrapped());
+        System.out.println(information.getKeywords());
+        System.out.println(information.getMetadataKeys());
+        System.out.println(information.getProducer());
+        System.out.println(information.getSubject());
+        System.out.println(information.getCOSObject());
+        System.out.println("----------------------------------------");
+
         PDFTextStripper pdfTextStripper = new PDFTextStripper();
         String text = pdfTextStripper.getText(pdDocument);
         System.out.println(text);
