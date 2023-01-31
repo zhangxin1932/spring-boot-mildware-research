@@ -35,6 +35,7 @@ import java.util.Objects;
  */
 public class PdfUtils {
 
+    private static final String PATH1 = "D:\\tmp\\pdf\\m1.pdf";
     private static final String CDE_PDF_PATH = "D:\\tmp\\pdf\\CXSS2101059-62增加适应症技术审评报告.pdf";
     private static final String CDE_PDF_PATH_2 = "D:\\tmp\\pdf\\注射用苯磺酸瑞马唑仑（CXHS2101053）申请上市技术审评报告.pdf";
     private static final String CDE_PDF_OUTPUT_PATH_BY_PDFBOX = "D:\\tmp\\pdf\\重组人生长激素注射液（CXSS2101059-62）增加适应症技术审评报告_pdfbox.txt";
@@ -42,7 +43,7 @@ public class PdfUtils {
     private static final String CDE_PDF_OUTPUT_PATH_BY_TABULA = "D:\\tmp\\pdf\\重组人生长激素注射液（CXSS2101059-62）增加适应症技术审评报告_tabula.txt";
 
     public static void main(String[] args) throws Exception {
-        f5();
+        f2();
     }
 
     private static void f7() throws Exception {
@@ -245,19 +246,20 @@ public class PdfUtils {
      * @throws Exception
      */
     private static void f2() throws Exception {
-        PDDocument pdDocument = PDDocument.load(new FileInputStream(new File(CDE_PDF_PATH)));
+        PDDocument pdDocument = PDDocument.load(new FileInputStream(new File(PATH1)));
         if (pdDocument.isEncrypted()) {
             System.out.println("encrypted-------");
         }
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
         stripper.setSortByPosition(true);
         Rectangle rectangle = new Rectangle(0, 0, 1000, 1000);
-        stripper.addRegion("applicant", rectangle);
+        stripper.addRegion("paper", rectangle);
         PDPageTree pages = pdDocument.getDocumentCatalog().getPages();
         for (PDPage page : pages) {
             stripper.extractRegions(page);
-            String applicant = stripper.getTextForRegion("applicant");
-            System.out.println(applicant);
+            String paper = stripper.getTextForRegion("paper");
+            String str = "   ";
+            System.out.println(paper);
         }
     }
 
