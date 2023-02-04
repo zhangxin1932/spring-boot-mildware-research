@@ -754,7 +754,20 @@ linux系统为每个程序分配4GB的虚拟内存，其中用户空间的虚拟
 也可以修改对栈的限制，来增大或减小创建的线程数目。
 ```
 
+
+
+# 100. 一些试验
+
+## 100.1 百万连接如何实现及测试
+
+https://mp.weixin.qq.com/s?__biz=MzUxNDA1NDI3OA==&mid=2247492766&idx=2&sn=b5df49147561e467fa5677b5bb09dacb&chksm=f9496577ce3eec61383994499d96a7f2b091b5eb8ee1ac47ad021f78072ae710f41d38257406&scene=27
+
+
+
+
+
 # 参考资料
+
 https://www.51cto.com/article/641015.html (java线程与OS线程)
 https://blog.csdn.net/guorui_java/article/details/113827888 (用户态和内核态)
 https://zhuanlan.zhihu.com/p/474022823 (java线程与OS线程)
