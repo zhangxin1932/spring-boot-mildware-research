@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.security.AccessController;
+//import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.PrivilegedAction;
 
@@ -61,7 +61,7 @@ public class FileMD5Util {
             }
 
             mappedByteBuffer.force();
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            /*AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 @Override
                 public Object run() {
                     try {
@@ -76,7 +76,7 @@ public class FileMD5Util {
                     log.info("clean MappedByteBuffer completed!!!");
                     return null;
                 }
-            });
+            });*/
 
         } catch (Exception e) {
             e.printStackTrace();
