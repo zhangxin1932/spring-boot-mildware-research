@@ -251,7 +251,10 @@ public class PdfUtils {
             System.out.println("encrypted-------");
         }
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-        stripper.setSortByPosition(true);
+        // 这里是个坑啊，设置成 true 时，可能导致读取乱序
+        // sort:设置为true 则按照行进行读取，默认是false
+        // stripper.setSortByPosition(true);
+        stripper.setSortByPosition(false);
         Rectangle rectangle = new Rectangle(0, 0, 1000, 1000);
         stripper.addRegion("paper", rectangle);
         PDPageTree pages = pdDocument.getDocumentCatalog().getPages();
