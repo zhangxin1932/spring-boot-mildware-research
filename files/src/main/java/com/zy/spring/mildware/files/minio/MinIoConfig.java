@@ -7,12 +7,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MinIoConfig {
 
-    @Bean
+    /*@Bean
     public MinioClient minioClient() {
         MinioClient minioClient = MinioClient.builder()
                 .endpoint("http://192.168.0.156", 9999, true)
                 .build();
         return minioClient;
-    }
+    }*/
 
 }

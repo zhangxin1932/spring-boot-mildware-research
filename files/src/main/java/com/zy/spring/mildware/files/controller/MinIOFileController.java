@@ -20,8 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class MinIOFileController {
 
-    @Autowired
-    private MinioClient minioClient;
+    /*@Autowired
+    private MinioClient minioClient;*/
 
     public String upload(@RequestParam("file") MultipartFile file) {
         /*BucketExistsArgs args = BucketExistsArgs.builder().bucket("minio-bucket01").build();

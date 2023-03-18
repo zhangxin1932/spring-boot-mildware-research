@@ -46,7 +46,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public void deleteAll() {
         log.info("开发初始化清理数据，start");
-        FileSystemUtils.deleteRecursively(rootPath.toFile());
+        // FileSystemUtils.deleteRecursively(rootPath.toFile());
         stringRedisTemplate.delete(Constants.FILE_UPLOAD_STATUS);
         stringRedisTemplate.delete(Constants.FILE_MD5_KEY);
         log.info("开发初始化清理数据，end");
@@ -94,7 +94,8 @@ public class StorageServiceImpl implements StorageService {
     public void uploadFileByMappedByteBuffer(MultipartFileParam param) throws IOException {
         String fileName = param.getName();
         String uploadDirPath = finalDirPath + param.getMd5();
-        String tempFileName = fileName + "_tmp";
+//        String tempFileName = fileName + "_tmp";
+        String tempFileName = fileName;
         File tmpDir = new File(uploadDirPath);
         File tmpFile = new File(uploadDirPath, tempFileName);
         if (!tmpDir.exists()) {
@@ -114,10 +115,11 @@ public class StorageServiceImpl implements StorageService {
         fileChannel.close();
 
         boolean isOk = checkAndSetUploadProgress(param, uploadDirPath);
-        if (isOk) {
+        /*if (isOk) {
             boolean flag = renameFile(tmpFile, fileName);
             System.out.println("upload complete !!" + flag + " name=" + fileName);
-        }
+        }*/
+        System.out.println("upload complete !!" + " name=" + fileName);
     }
 
     /**
