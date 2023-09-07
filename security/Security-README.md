@@ -31,3 +31,8 @@ MD2/MD4/MD5/RSAWithSHA1/AES-ECB/SHA1
 >> 个人数据的传输, 存储(db, redis)建议使用AES-CBC加密;
 >> 有搜索的允许使用AES-ECB或者HMAC
 ```
+
+# 6.跨域解决方案
+https://blog.fivk.cn/archives/1706.html
+https://blog.csdn.net/weixin_45433031/article/details/123351486
+
